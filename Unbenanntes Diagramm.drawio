@@ -469,6 +469,15 @@
         <mxCell id="yO4fIAg9UzdIjJUz5sfi-92" value="ERM" style="rounded=0;whiteSpace=wrap;html=1;fontSize=24;" vertex="1" parent="1">
           <mxGeometry x="390" width="120" height="60" as="geometry" />
         </mxCell>
+        <mxCell id="yO4fIAg9UzdIjJUz5sfi-93" value="0/1 - n" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="300" y="130" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="yO4fIAg9UzdIjJUz5sfi-94" value="n - 0/1" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="590" y="300" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="yO4fIAg9UzdIjJUz5sfi-96" value="1 - n" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="510" y="530" width="60" height="30" as="geometry" />
+        </mxCell>
       </root>
     </mxGraphModel>
   </diagram>
