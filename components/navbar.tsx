@@ -10,6 +10,10 @@ export default function Navbar() {
           <span className="font-bold">Luxury Hotel</span>
         </Link>
         <nav className="ml-auto flex gap-4 sm:gap-6">
+          <Link className="text-sm font-medium hover:underline underline-offset-4"
+                href="/login">
+            Login
+          </Link>
           <Link
             className="text-sm font-medium hover:underline underline-offset-4"
             href="/"
@@ -33,6 +37,8 @@ export default function Navbar() {
     </div>
   );
 }
+
+
 
 function HotelIcon(props: JSX.IntrinsicAttributes & SVGProps<SVGSVGElement>) {
   return (
