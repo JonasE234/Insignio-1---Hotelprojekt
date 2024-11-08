@@ -1,7 +1,5 @@
 <?php
 
-use JetBrains\PhpStorm\NoReturn;
-
 class ApiHandler
 {
     const TOKEN_INDEX = 'rest_token';
