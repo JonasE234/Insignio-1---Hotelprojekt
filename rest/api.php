@@ -13,10 +13,10 @@ class ApiHandler
         '403' => 'HTTP/1.1 403 Forbidden',
         '400' => 'HTTP/1.1 400 Bad Request',
         'no_class' => 'HTTP/1.1 400 Bad Request. Could not resolve $s',
-        'no_method' => "HTTP/1.1 400 Bad Request. Could not find any method '%s' in class '%s'"
+        'no_method' => "HTTP/1.1 404 Not Found. Could not find any method '%s' in class '%s'"
     ];
 
-    function main()
+    public function main()
     {
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $uri = explode('/', $uri);
@@ -83,7 +83,7 @@ class ApiHandler
      * @param int $argsStartKey
      * @return array
      */
-    function getArgs(array $uri, int $argsStartKey): array
+    protected function getArgs(array $uri, int $argsStartKey): array
     {
         $args = [];
         // we want these args at the end.
@@ -111,7 +111,7 @@ class ApiHandler
      * @param array $args
      * @return string
      */
-    function getErrorLabel(string $label, array $args = []): string
+    protected function getErrorLabel(string $label, array $args = []): string
     {
         $msg = self::ERRORS[$label];
 
@@ -128,7 +128,7 @@ class ApiHandler
      * @param array $args
      * @return never
      */
-    function exitWithError(string $errorKey, array $args = []): never
+    protected function exitWithError(string $errorKey, array $args = []): never
     {
         $msg = $this->getErrorLabel($errorKey, $args);
         header($msg);
