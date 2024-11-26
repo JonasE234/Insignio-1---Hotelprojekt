@@ -5,6 +5,12 @@
         "symfony/cache": "^7"
     },
     "autoload": {
-        "psr-0": {"": "src/"}
+        "psr-0": {"": "src/"},
+        "psr-4": {
+            "DBAL\\DriverManager\\": "Doctrine\\",
+            "DBAL\\Connection\\": "Doctrine\\",
+            "Config\\": "Utils\\",
+            "Utils\\": "Utils\\"
+        }
     }
 }
