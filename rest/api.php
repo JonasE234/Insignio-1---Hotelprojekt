@@ -42,17 +42,19 @@ class ApiHandler
             $this->exitWithError('no_method', [$method, $className]);
         }
 
+        //prepare args
         $args = $this->getArgs($uri, self::METHOD_INDEX);
+
         try {
-            $response = $endpoint->$method(...$args);
+            // finally call the api endpoint
+            $response = $endpoint->$method(...$args['args']);
         } catch (Throwable $t) {
             echo $t->getMessage();
             throw $t;
         }
 
         // add debug info to response
-        if (in_array('DEBUG', array_values($args))) {
-            unset($args[array_search('DEBUG', $args)]);
+        if ($args['debug'] === true) {
 
             $response = [
                 'received_args' => $args,
@@ -69,9 +71,8 @@ class ApiHandler
     }
 
     /**
-     * Differentiates between GET and POST requests.
-     * GET expects args through the header 'args'
      * POST expects args through $_POST (application/x-www-form-urlencoded or multipart/form-data)
+     * GET uses another method:
      *
      * Further args can be parsed through the url request as well,
      * like /rest/api.php/ClassName/methodName/arg1/arg2
@@ -83,24 +84,28 @@ class ApiHandler
      */
     protected function getArgs(array $uri, int $argsStartKey): array
     {
+        $debug = false;
         $args = [];
         // we want these args at the end.
-        $additionalArgs = ($_SERVER['REQUEST_METHOD'] === 'GET') ?
-            (getallheaders()['args'] ?? []) :
-            ($_POST ?? []);
+        $additionalArgs = $_POST ?? [];
 
         foreach ($uri as $key => $value) {
-            if ($key > $argsStartKey) {
-                $args[] = $value;
+            if ($key <= $argsStartKey) {
+                continue;
+            } else if ($value === 'DEBUG') {
+                $debug = true;
+                continue;
             }
+
+            $args[] = $value;
         }
 
         if (!empty($additionalArgs)) {
-            //capsule additional args.
-            array_push($args, [$additionalArgs]);
+            //add additional args.
+            array_push($args, $additionalArgs);
         }
 
-        return $args;
+        return ['args' => $args, 'debug' => $debug];
     }
 
     /**
@@ -133,6 +138,6 @@ class ApiHandler
         exit($msg);
     }
 }
-
+require_once ('../vendor/autoload.php');
 $api = new ApiHandler();
 $api->main();

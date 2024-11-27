@@ -16,6 +16,10 @@ class ComposerStaticInit6f85502b52ffab0d6a85b356c58b065f
     );
 
     public static $prefixLengthsPsr4 = array (
+        'U' => 
+        array (
+            'Utils\\' => 6,
+        ),
         'S' => 
         array (
             'Symfony\\Polyfill\\Mbstring\\' => 26,
@@ -46,10 +50,20 @@ class ComposerStaticInit6f85502b52ffab0d6a85b356c58b065f
             'Doctrine\\Common\\Lexer\\' => 22,
             'Doctrine\\Common\\Collections\\' => 28,
             'Doctrine\\Common\\' => 16,
+            'DBAL\\DriverManager\\' => 19,
+            'DBAL\\Connection\\' => 16,
+        ),
+        'C' => 
+        array (
+            'Config\\' => 7,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'Utils\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/Utils',
+        ),
         'Symfony\\Polyfill\\Mbstring\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/polyfill-mbstring',
@@ -137,6 +151,18 @@ class ComposerStaticInit6f85502b52ffab0d6a85b356c58b065f
         'Doctrine\\Common\\' => 
         array (
             0 => __DIR__ . '/..' . '/doctrine/event-manager/src',
+        ),
+        'DBAL\\DriverManager\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/Doctrine',
+        ),
+        'DBAL\\Connection\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/Doctrine',
+        ),
+        'Config\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/Utils',
         ),
     );
 
