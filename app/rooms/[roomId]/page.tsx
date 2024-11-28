@@ -1,168 +1,135 @@
 "use client";
 
-import Image from "next/image";
-import { Calendar } from "@/components/ui/calendar";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { Star, Wifi, Parking, Coffee, Utensils, Tv } from "lucide-react";
-import { Key, useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
-const mockRoomData = {
-  id: 1,
-  name: "Deluxe Ocean View Suite",
-  description:
-    "Spacious suite with breathtaking ocean views, perfect for a luxurious getaway.",
-  price: 299,
-  capacity: 2,
-  size: "45 m²",
-  bed: "1 King Bed",
-  rating: 4.8,
-  reviews: 124,
-  amenities: [
-    "Free Wi-Fi",
-    "Parking",
-    "Coffee Maker",
-    "Mini Kitchen",
-    "Smart TV",
-  ],
-  images: [
-    "/placeholder.svg?height=400&width=600",
-    "/placeholder.svg?height=400&width=600",
-    "/placeholder.svg?height=400&width=600",
-  ],
-};
-
-async function fetchRoomData(id: string) {
-  if (id === "1") {
-    return mockRoomData;
-  }
-  throw new Error("Not Found");
+interface RoomData {
+  id: number;
+  name: string;
+  description: string;
+  features: string[];
+  price: number;
+  rating?: number;
 }
 
 export default function RoomDetailPage() {
-  const [roomData, setRoomData] = useState<typeof mockRoomData | null>(null);
-  const [error, setError] = useState<unknown | null>(null);
   const params = useParams<{ roomId: string }>();
+  const roomId = params?.roomId;
+
+  const [roomData, setRoomData] = useState<RoomData | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
   useEffect(() => {
-    const fetchData = async () => {
+    if (!roomId) {
+      setError("No room ID provided.");
+      setLoading(false);
+      return;
+    }
+
+    const fetchRoomData = async () => {
       try {
-        const data = await fetchRoomData(params.roomId);
+        const response = await fetch(`/api/rooms?id=${roomId}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch room data");
+        }
+        const data = await response.json();
         setRoomData(data);
-      } catch (error: unknown) {
-        setError(error);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "An unknown error occurred");
+      } finally {
+        setLoading(false);
       }
     };
-    fetchData();
-  }, [params.roomId]);
 
-  if (error) {
-    return <div>Fehler: {error.message}</div>;
-  }
+    fetchRoomData();
+  }, [roomId]);
 
-  if (!roomData) {
-    return <div>Lade Daten...</div>;
-  }
+  if (loading) return <div className="text-center py-8">Loading room details...</div>;
+  if (error) return <div className="text-center py-8 text-red-500">Error: {error}</div>;
+  if (!roomData) return <div className="text-center py-8">No room data available</div>;
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-6">{roomData.name}</h1>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div>
-          <div className="relative h-[400px] mb-4 rounded-lg overflow-hidden">
-            <Image
-              src={roomData.images[0]}
+      <div className="container mx-auto px-6 py-12">
+        {/* Image */}
+        <div className="relative w-full h-[500px] rounded-lg overflow-hidden shadow-md mb-8">
+          <Image
+              src={`/images/rooms/${roomId}.jpg`}
               alt={roomData.name}
               fill
               className="object-cover"
-            />
+          />
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {/* Main */}
+          <div className="md:col-span-2">
+            <h1 className="text-4xl font-extrabold text-gray-900 mb-4">{roomData.name}</h1>
+            <p className="text-lg text-gray-600 leading-relaxed mb-6">
+              {roomData.description}
+            </p>
+
+            {/* Features */}
+            <div className="flex flex-wrap gap-2">
+              {roomData.features.map((feature, index) => (
+                  <Badge
+                      key={index}
+                      variant="secondary"
+                      className="bg-gray-100 text-gray-800 px-3 py-1 rounded-lg transition-all hover:bg-gray-200 hover:shadow-sm"
+                  >
+                    {feature}
+                  </Badge>
+              ))}
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            {roomData.images.slice(1).map((image, index) => (
-              <div
-                key={index}
-                className="relative h-[200px] rounded-lg overflow-hidden"
-              >
-                <Image
-                  src={image}
-                  alt={`${roomData.name} - Image ${index + 2}`}
-                  fill
-                  className="object-cover"
-                />
+
+          {/* Price and booking */}
+          <div className="md:col-span-1">
+            <div className="bg-white border rounded-lg shadow-md p-6">
+              {/* Price */}
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <span className="text-3xl font-bold text-gray-900">${roomData.price}</span>
+                  <span className="text-sm text-gray-500"> / night</span>
+                </div>
+                <div className="flex items-center text-gray-600">
+                  {roomData.rating && (
+                      <>
+                        <span className="text-lg font-semibold mr-1">{roomData.rating}</span>
+                        <span>⭐</span>
+                      </>
+                  )}
+                </div>
               </div>
-            ))}
+
+              {/* Booking details */}
+              <div className="mb-4 text-sm text-gray-600">
+                <p>This price includes taxes and fees.</p>
+                <p>Free cancellation available until 24 hours before check-in.</p>
+              </div>
+
+              {/* Button */}
+              <Button className="w-full py-4 text-lg font-semibold bg-blue-600 text-white hover:bg-blue-700 transition-all">
+                Book Now
+              </Button>
+            </div>
           </div>
         </div>
 
-        <div>
-          <Card>
-            <CardHeader>
-              <CardTitle>Room Details</CardTitle>
-              <CardDescription>
-                <div className="flex items-center gap-2">
-                  <Star className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-                  <span className="font-semibold">{roomData.rating}</span>
-                  <span className="text-muted-foreground">
-                    ({roomData.reviews} reviews)
-                  </span>
-                </div>
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="mb-4">{roomData.description}</p>
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                <div>
-                  <span className="font-semibold">Capacity:</span>{" "}
-                  {roomData.capacity} guests
-                </div>
-                <div>
-                  <span className="font-semibold">Size:</span> {roomData.size}
-                </div>
-                <div>
-                  <span className="font-semibold">Bed:</span> {roomData.bed}
-                </div>
-              </div>
-              <Separator className="my-4" />
-              <h3 className="font-semibold mb-2">Amenities</h3>
-              <div className="flex flex-wrap gap-2">
-                {roomData.amenities.map((amenity: string, index: Key) => (
-                  <Badge key={index} variant="secondary">
-                    {amenity}
-                  </Badge>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter>
-              <div className="w-full">
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-2xl font-bold">${roomData.price}</span>
-                  <span className="text-muted-foreground">per night</span>
-                </div>
-                <Button className="w-full">Book Now</Button>
-              </div>
-            </CardFooter>
-          </Card>
-
-          <Card className="mt-6">
-            <CardHeader>
-              <CardTitle>Check Availability</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <Calendar mode="range" className="rounded-md border" />
-            </CardContent>
-          </Card>
+        {/* Additional information */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-semibold text-gray-800 mb-4">Why You'll Love This Room</h2>
+          <p className="text-lg text-gray-600 leading-relaxed">
+            This room offers everything you need for a memorable stay. From luxurious
+            furnishings to modern amenities, every detail has been designed to ensure your
+            comfort. Whether you're relaxing with a stunning view or enjoying the premium
+            facilities, you'll find this room is perfect for both business and leisure
+            travelers.
+          </p>
         </div>
       </div>
-    </div>
   );
 }
