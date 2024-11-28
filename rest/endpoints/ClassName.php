@@ -8,7 +8,7 @@ use Utils\Config;
  */
 class ClassName
 {
-    function methodName($arg1, $arg2){
+    function methodName($arg1 = 1, $arg2 = 2){
         $config = Config::getInstance();
 
         $t = Utils::createQuery();
