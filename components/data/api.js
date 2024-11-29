@@ -23,7 +23,7 @@ class Api
         const options = {
             method: method,
             //mode: "no-cors",
-            headers: this.BASE_HEADER //Object.assign(this.BASE_HEADER, headers)
+            //headers: this.BASE_HEADER //Object.assign(this.BASE_HEADER, headers)
         };
 
         if (method !== 'GET') {
