@@ -5,14 +5,16 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import {api} from "@/components/data/api";
 
 interface RoomData {
   id: number;
   name: string;
   description: string;
-  features: string[];
+  features: string [];
   price: number;
   rating?: number;
+  long_description: string;
 }
 
 export default function RoomDetailPage() {
@@ -32,12 +34,8 @@ export default function RoomDetailPage() {
 
     const fetchRoomData = async () => {
       try {
-        const response = await fetch(`/api/rooms?id=${roomId}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch room data");
-        }
-        const data = await response.json();
-        setRoomData(data);
+        await api.call('Rooms/getRoomData', 'POST', setRoomData, [roomId]);
+        //setLoading(false);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An unknown error occurred");
       } finally {
@@ -123,11 +121,7 @@ export default function RoomDetailPage() {
         <div className="mt-12">
           <h2 className="text-2xl font-semibold text-gray-800 mb-4">Why You'll Love This Room</h2>
           <p className="text-lg text-gray-600 leading-relaxed">
-            This room offers everything you need for a memorable stay. From luxurious
-            furnishings to modern amenities, every detail has been designed to ensure your
-            comfort. Whether you're relaxing with a stunning view or enjoying the premium
-            facilities, you'll find this room is perfect for both business and leisure
-            travelers.
+            {roomData.long_description}
           </p>
         </div>
       </div>
