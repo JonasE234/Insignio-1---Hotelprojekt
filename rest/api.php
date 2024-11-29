@@ -3,8 +3,8 @@
 class ApiHandler
 {
     const TOKEN_INDEX = 'rest_token';
-    const CLASS_INDEX = 4;
-    const METHOD_INDEX = 5;
+    const CLASS_INDEX = 0;
+    const METHOD_INDEX = 1;
     const ENDPOINT_FOLDER = '/endpoints/';
 
     const ERRORS = [
@@ -16,17 +16,21 @@ class ApiHandler
 
     public function main()
     {
+        $token = '1234';
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
         $uri = explode('/', $uri);
         $headers = getallheaders();
 
-        if (empty($headers[self::TOKEN_INDEX])) {
+        //prepare args
+        $data = $this->getArgs($uri);
+
+        if (empty($data['token']) || $data['token'] !== $token) {
             $this->exitWithError('403');
-        } else if (empty($uri[self::CLASS_INDEX]) || empty($uri[self::METHOD_INDEX])) {
+        } else if (empty($data['class']) || empty($data['method'])) {
             $this->exitWithError('400');
         }
 
-        $className = $uri[self::CLASS_INDEX];
+        $className = $data['class'];
         $classFile = $className . '.php';
         $classPath = self::ENDPOINT_FOLDER . $classFile;
 
@@ -36,28 +40,24 @@ class ApiHandler
 
         require_once __DIR__ . $classPath;
         $endpoint = new $className();
-        $method = $uri[self::METHOD_INDEX];
+        $method = $data['method'];
 
         if (!method_exists($endpoint, $method)) {
             $this->exitWithError('no_method', [$method, $className]);
         }
 
-        //prepare args
-        $args = $this->getArgs($uri, self::METHOD_INDEX);
-
         try {
             // finally call the api endpoint
-            $response = $endpoint->$method(...$args['args']);
+            $response = $endpoint->$method(...$data['args']);
         } catch (Throwable $t) {
             echo $t->getMessage();
             throw $t;
         }
 
         // add debug info to response
-        if ($args['debug'] === true) {
-
+        if ($data['debug'] === true) {
             $response = [
-                'received_args' => $args,
+                'received_args' => $data,
                 'class' => $className,
                 'class_path' => $classPath,
                 'method' => $method,
@@ -67,32 +67,34 @@ class ApiHandler
             ];
         }
 
+        header("Access-Control-Allow-Origin: *");
         echo json_encode($response);
     }
 
     /**
-     * POST expects args through $_POST (application/x-www-form-urlencoded or multipart/form-data)
-     * GET uses another method:
+     * POST expects args through body
      *
-     * Further args can be parsed through the url request as well,
-     * like /rest/api.php/ClassName/methodName/arg1/arg2
-     * These args have priority inside the args array (lower index)
+     * Class and method are expected as follows:
+     * like /rest/api.php/ClassName/methodName
      *
      * @param array $uri
-     * @param int $argsStartKey
      * @return array
      */
-    protected function getArgs(array $uri, int $argsStartKey): array
+    protected function getArgs(array $uri): array
     {
         $debug = false;
         $args = [];
-        // we want these args at the end.
-        $additionalArgs = $_POST ?? [];
+        $argsStart = false;
+        $fileName = basename($_SERVER["SCRIPT_FILENAME"]);
+        $body = json_decode(file_get_contents('php://input'), true) ?? $_POST ?? [];
 
         foreach ($uri as $key => $value) {
-            if ($key <= $argsStartKey) {
+            if ($argsStart === false && $value !== $fileName) {
                 continue;
-            } else if ($value === 'DEBUG') {
+            } else if ($argsStart === false && $value === $fileName) {
+                $argsStart = true;
+                continue;
+            } else if ($argsStart === true && $value === 'DEBUG') {
                 $debug = true;
                 continue;
             }
@@ -100,12 +102,13 @@ class ApiHandler
             $args[] = $value;
         }
 
-        if (!empty($additionalArgs)) {
-            //add additional args.
-            array_push($args, $additionalArgs);
-        }
-
-        return ['args' => $args, 'debug' => $debug];
+        return [
+            'class' => $args[self::CLASS_INDEX],
+            'method' => $args[self::METHOD_INDEX],
+            'args' => $body['args'] ?? [],
+            'token' => $body[self::TOKEN_INDEX],
+            'debug' => $debug
+        ];
     }
 
     /**
@@ -138,6 +141,7 @@ class ApiHandler
         exit($msg);
     }
 }
-require_once ('../vendor/autoload.php');
+
+require_once('../vendor/autoload.php');
 $api = new ApiHandler();
 $api->main();
