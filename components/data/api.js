@@ -1,22 +1,36 @@
 class Api
 {
+    BASE_URL = 'http://localhost/Insignio-1---Hotelprojekt/rest/api.php/';
+    BASE_HEADER =  {
+        //'Content-Type': 'application/json',
+        //'rest_token' : '1234' ,
+        //'Access-Control-Allow-Origin' : '*',
+        //'Access-Control-Allow-Credentials' : true
+    }
+    BASE_BODY = {
+        'rest_token' : '1234'
+    }
+
     constructor()
     {
         // get api token here? Through config?
         console.log('api const')
     }
 
-    call(url, method, callback, headers = {}, body = {}) {
+    call(url, method, callback, body = []) {
+        // atm only POST method works
+        method = 'POST';
         const options = {
             method: method,
-            headers: headers || { 'Content-Type': 'application/json' }
+            //mode: "no-cors",
+            //headers: this.BASE_HEADER //Object.assign(this.BASE_HEADER, headers)
         };
 
         if (method !== 'GET') {
-            options.body = body || '';//JSON.stringify({ title: 'React PUT Request Example' })
+            options.body = JSON.stringify(Object.assign(this.BASE_BODY, {args : body}));//JSON.stringify({ title: 'React PUT Request Example' })
         }
 
-        fetch(url, options)
+        fetch(this.BASE_URL + url, options)
             .then((res) => res.json())
             .then(
                 (result) => {
