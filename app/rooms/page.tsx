@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import {api} from "@/components/data/api";
 
 interface RoomData {
   id: number;
@@ -30,12 +31,11 @@ export default function RoomsPage() {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        const response = await fetch("/api/rooms");
-        if (!response.ok) {
-          throw new Error("Failed to fetch room data");
-        }
-        const data: RoomData[] = await response.json();
-        setRooms(data);
+        //let data: RoomData[];
+        await api.call("Rooms/getAllRooms", 'POST', setRooms, []);
+
+        //const data: RoomData[] = await response.json();
+        //setRooms(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An unknown error occurred");
       } finally {
