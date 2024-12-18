@@ -21,13 +21,11 @@ class Api
         // atm only POST method works
         method = 'POST';
         const options = {
-            method: method,
-            //mode: "no-cors",
-            //headers: this.BASE_HEADER //Object.assign(this.BASE_HEADER, headers)
+            method: method
         };
 
         if (method !== 'GET') {
-            options.body = JSON.stringify(Object.assign(this.BASE_BODY, {args : body}));//JSON.stringify({ title: 'React PUT Request Example' })
+            options.body = JSON.stringify(Object.assign(this.BASE_BODY, {args : body}));
         }
 
         fetch(this.BASE_URL + url, options)

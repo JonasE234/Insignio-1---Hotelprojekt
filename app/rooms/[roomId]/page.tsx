@@ -4,6 +4,7 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import {api} from "@/components/data/api";
 
 interface RoomData {
   id: number;
@@ -33,12 +34,7 @@ export default function RoomDetailPage() {
 
     const fetchRoomData = async () => {
       try {
-        const response = await fetch(`/api/rooms?id=${roomId}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch room data");
-        }
-        const data = await response.json();
-        setRoomData(data);
+        await api.call('Rooms/getRoomData', 'POST', setRoomData, [roomId]);
       } catch (err) {
         setError(err instanceof Error ? err.message : "An unknown error occurred");
       } finally {
