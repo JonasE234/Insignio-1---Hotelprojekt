@@ -6,6 +6,7 @@ import { DayPicker, DateRange } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import {user} from "@/components/data/authentication";
 
 interface RoomData {
     id: number;
@@ -51,7 +52,16 @@ export default function BookingPage() {
     const handleBooking = async () => {
         setValidationError(null);
 
-        if (!selectedDates?.from || !selectedDates?.to) {
+        if (user.USER_TOKEN === '') {
+            setValidationError("You must be logged in in order to book a room");
+            return;
+        }
+
+        if (selectedDates?.from && !selectedDates?.to) {
+            // Enable one day booking
+            selectedDates.to = selectedDates.from;
+        } else if (!selectedDates?.from) {
+            // From must be set
             setValidationError("Please select both a check-in and a check-out date.");
             return;
         }
