@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import React from "react";
-import {user} from "@/components/data/user";
+import {user} from "@/components/data/authentication";
 
 const formSchema = z.object({
     username: z.string().min(2, {
@@ -25,9 +25,7 @@ const formSchema = z.object({
     password: z.string()
 })
 
-export default function ProfileForm(this: any) {
-    //user.name = "test"
-    // 1. Define your form.
+export default function ProfileForm(this: any) { 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -36,7 +34,6 @@ export default function ProfileForm(this: any) {
         },
     })
 
-    // 2. Define a submit handler.
     function onSubmit(values: z.infer<typeof formSchema>) {
         // Do something with the form values.
         // ✅ This will be type-safe and validated.
@@ -72,7 +69,6 @@ export default function ProfileForm(this: any) {
                                 <Input type={"password"} {...field} />
                             </FormControl>
                             <FormDescription>
-                                This is your login password.
                             </FormDescription>
                             <FormMessage />
                         </FormItem>

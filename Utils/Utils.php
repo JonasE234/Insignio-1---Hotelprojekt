@@ -8,15 +8,13 @@ use Doctrine\DBAL\Query\QueryBuilder;
 
 class Utils
 {
-    static function getConnection(): Connection
+    public static function getConnection(): Connection
     {
         $config = Config::getInstance();
-
-        $conn = DriverManager::getConnection($config->config['db_data']);
-        return $conn;
+        return DriverManager::getConnection($config->config['db_data']);;
     }
 
-    static function createQuery(): QueryBuilder
+    public static function createQuery(): QueryBuilder
     {
         $con = self::getConnection();
         return $con->createQueryBuilder();
