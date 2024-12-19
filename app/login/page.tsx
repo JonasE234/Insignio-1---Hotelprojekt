@@ -25,7 +25,7 @@ const formSchema = z.object({
     password: z.string()
 })
 
-export default function ProfileForm(this: any) {
+export default function ProfileForm(this: any) { 
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -38,10 +38,6 @@ export default function ProfileForm(this: any) {
         // Do something with the form values.
         // ✅ This will be type-safe and validated.
         user.login(values.username, values.password)
-    }
-
-    function handleSessionToken() {
-        console.log('test');
     }
 
     return (

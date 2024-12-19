@@ -44,7 +44,11 @@ class Authentication
         }
 
         if (password_verify($password, $user['user_hash']) ) {
-            return  $this->getToken();
+            $sessionToken = $this->getToken();
+            return  [
+                'token' => $sessionToken['token'],
+                'user_id' => $user['id'],
+            ];
         } else {
             throw new Exception('Incorrect user name or password. Please try again.');
         }

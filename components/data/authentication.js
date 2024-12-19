@@ -10,16 +10,18 @@ class User
 
     USER_TOKEN = '';
 
+    USER_ID = '';
+
+
     setToken (response) {
-        USER_TOKEN = response.token;
-        let router = useRouter();
-        router.push('/');
+        this.USER_TOKEN = response.token;
+        this.USER_ID = response.user_id;
     };
 
     login (username, password)
     {
         try {
-            api.call(this.LOGIN_URL, 'POST', (response) => {this.setToken(response); }, {
+            api.call(this.LOGIN_URL, 'POST', this.setToken.bind(this), {
                 'username': username,
                 'password': password,
             });
