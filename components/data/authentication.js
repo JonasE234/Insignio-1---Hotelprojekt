@@ -38,6 +38,6 @@ class User
 
 /**
  * "use client"
- * import {user} from "@/components/data/user";
+ * import {user} from "@/components/data/authentication";
  */
 export const user = new User()
