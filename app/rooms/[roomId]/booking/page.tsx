@@ -64,7 +64,7 @@ export default function BookingPage() {
 
 
         if (!isLoading) {
-            let userId = 1
+            let userId = user.USER_ID
             setIsLoading(true)
             const callback =() => {
                 router.push(`/rooms/${roomData?.id}/booking/confirmation?from=${selectedDates.from.toISOString()}&to=${selectedDates.to.toISOString()}`);
