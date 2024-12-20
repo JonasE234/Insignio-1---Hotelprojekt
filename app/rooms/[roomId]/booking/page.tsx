@@ -6,6 +6,7 @@ import { DayPicker, DateRange } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import {api} from "@/components/data/api";
 import {user} from "@/components/data/authentication";
 
 interface RoomData {
@@ -33,12 +34,7 @@ export default function BookingPage() {
         }
         const fetchRoomData = async () => {
             try {
-                const response = await fetch(`/api/rooms?id=${roomId}`);
-                if (!response.ok) {
-                    throw new Error("Failed to fetch room data.");
-                }
-                const data = await response.json();
-                setRoomData(data);
+                await api.call('Rooms/getRoomData', 'POST', setRoomData, [roomId]);
             } catch (err) {
                 setFetchError(
                     err instanceof Error ? err.message : "An unknown error occurred."
@@ -66,10 +62,16 @@ export default function BookingPage() {
             return;
         }
 
-        // Placeholder: database handling
-        // use isLoading to prevent multiple submissions
-        router.push(`/rooms/${roomData?.id}/booking/confirmation?from=${selectedDates.from.toISOString()}&to=${selectedDates.to.toISOString()}`);
 
+        if (!isLoading) {
+            let userId = 1
+            setIsLoading(true)
+            const callback =() => {
+                router.push(`/rooms/${roomData?.id}/booking/confirmation?from=${selectedDates.from.toISOString()}&to=${selectedDates.to.toISOString()}`);
+            }
+
+            api.call('Reservations/bookRoom', 'POST', callback, [roomId, userId, selectedDates.from.toISOString(), selectedDates.to.toISOString()]);
+        }
     };
 
     if (fetchError && !roomData) {

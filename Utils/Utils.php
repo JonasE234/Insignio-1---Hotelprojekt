@@ -19,4 +19,14 @@ class Utils
         $con = self::getConnection();
         return $con->createQueryBuilder();
     }
+
+    static function getDateFormat(): string
+    {
+        return 'Y-m-d';
+    }
+
+    static function getDateTimeFormat(): string
+    {
+        return 'Y-m-d h:i:s';
+    }
 }
